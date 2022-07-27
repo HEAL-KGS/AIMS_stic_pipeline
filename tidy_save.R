@@ -8,14 +8,8 @@ library(STICr)
 
 # Create list of file paths to iterate over 
 data_dir <- "raw_csv_v1"
-
 fs::dir_ls(data_dir)
-
 stic_files <- fs::dir_ls(file.path(data_dir), regexp = "\\.csv$")
-
-
-# assignment of i to test loop
-i <- 20
 
 # loop for applying tidy_hobo_data and naming correctly 
 for(i in 1:length(stic_files)) {
@@ -55,15 +49,12 @@ for(i in 1:length(stic_files)) {
     sublocation <- "LS"
   }
   
-  # save in correct format 
+  # save in correct format, i.e., 
+  # startDate-endDate_siteID_rType_rep_sublocation
+  # 20220403-20220620_OKM01_STIC_00_HS.csv
   write_csv(stic_data_tidy, file.path(data_dir, "tidy", 
                                             paste0(start_date, "-", end_date, "_", site_name, "_",
                                                    "STIC_00", sublocation, ".csv")))
-  
-  # startDate-endDate_siteID_rType_rep_sublocation
-  # 20220403-20220620_OKM01_STIC_00_HS.csv
-  
-    
   # status update
   print(paste0("saved tidy STIC # ", i, " of ", length(stic_files), " at ", Sys.time()))
   
