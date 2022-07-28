@@ -66,7 +66,7 @@ for(i in 1:length(stic_files)) {
   # 20220403-20220620_OKM01_STIC_00_HS.csv
   write_csv(stic_data_tidy, file.path(data_dir, "tidy", 
                                             paste0(start_date, "-", end_date, "_", site_name, "_",
-                                                   "STIC_00_", sublocation, ".csv")))
+                                                   "STIC_00_", subloc, ".csv")))
   # status update
   print(paste0("saved tidy STIC # ", i, " of ", length(stic_files), " at ", Sys.time()))
   
