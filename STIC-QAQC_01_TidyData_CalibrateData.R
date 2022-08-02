@@ -1,13 +1,19 @@
-# Getting the tidy files in the right format
+# STIC-QAQC_01_TidyData_CalibrateData.R
+# First AIMS STIC pipeline script
+# Iterates tidy_hobo_data over a folder of raw STIC CSVs
+# Then, saves the tidy files in the correct AIMS format:
 # startDate-endDate_siteID_rType_rep_sublocation
-# 20220403-20220620_OKM01_STIC_00_HS.csv
+# Example: 20220403-20220620_OKM01_STIC_00_HS.csv
+# After data is tidied, this script also iterates get_calibration and 
+# apply_calibration to produce a folder of tidied CSVs with the 
+# calibrated SpC column, then saves with the same naming scheme
 
 # load STICr and tidyverse
 library(tidyverse)
 library(STICr)
 
 # Create list of file paths to iterate over 
-data_dir <- "raw_csv_02"
+data_dir <- "raw_csv_01"
 fs::dir_ls(data_dir)
 stic_files <- fs::dir_ls(file.path(data_dir), regexp = "\\.csv$")
 
@@ -23,7 +29,7 @@ for(i in 1:length(stic_files)) {
     str_sub(-8, -1)   
   
   # bring in index of SNs and site names 
-  sn_index <- read_csv("STIC_SN_index_02.csv") %>% 
+  sn_index <- read_csv("STIC_SN_index_01.csv") %>% 
     drop_na()
   
   # create site name var for use in saving later 
@@ -63,22 +69,32 @@ for(i in 1:length(stic_files)) {
   # save in correct format, i.e., 
   # startDate-endDate_siteID_rType_rep_sublocation
   # 20220403-20220620_OKM01_STIC_00_HS.csv
-  write_csv(stic_data_tidy, file.path(data_dir, "tidy", 
+  tidy_save_dir <- "tidy"
+  write_csv(stic_data_tidy, file.path(tidy_save_dir, 
                                             paste0(start_date, "-", end_date, "_", site_name, "_",
                                                    "STIC_00_", subloc, ".csv")))
   
   # status update for tidying
   print(paste0("saved tidy STIC # ", i, " of ", length(stic_files), " at ", Sys.time()))
   
-  # After writing tidy, we could calibrate and save again at this point
+  # Now begin calibrating and re-saving the tidied CSVs:
   
+  # bring in calibration points dataframe
   stic_calibrations <- read_csv("stic_calibration.csv") 
   
   # get and apply calibration
   logger_calibration <- subset(stic_calibrations, sn == logger_no)
-  calibration_fit <- get_calibration(logger_calibration)
-  stic_data_calibrated <- apply_calibration(stic_data_tidy, calibration_fit)
   
+  # Create column of NAs for SpC if there is no calibration info for that logger
+  if (dim(logger_calibration)[1] == 0) {
+    stic_data_calibrated <- stic_data_tidy %>% 
+      mutate(SpC = NA)
+  } else {
+    calibration_fit <- get_calibration(logger_calibration)
+    stic_data_calibrated <- apply_calibration(stic_data_tidy, calibration_fit)
+  }
+  
+  # Save in correct format
   calibrated_save_dir <- "calibrated"
   write_csv(stic_data_calibrated, file.path(calibrated_save_dir, 
                                       paste0(start_date, "-", end_date, "_", site_name, "_",
@@ -86,5 +102,4 @@ for(i in 1:length(stic_files)) {
   
   # status update for calibrating
   print(paste0("saved calibrated STIC # ", i, " of ", length(stic_files), " at ", Sys.time()))
-  
 }
