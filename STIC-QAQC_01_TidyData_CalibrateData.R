@@ -13,7 +13,7 @@ library(tidyverse)
 library(STICr)
 
 # Create list of file paths to iterate over 
-data_dir <- "raw_csv_01"
+data_dir <- "raw_csv_02"
 fs::dir_ls(data_dir)
 stic_files <- fs::dir_ls(file.path(data_dir), regexp = "\\.csv$")
 
@@ -25,11 +25,11 @@ for(i in 1:length(stic_files)) {
   # isolate SN from full file path
   logger_no <- gsub(".csv", "", path_to_raw) %>% 
     gsub("_STIC", "", .) %>% 
-    gsub("raw_02/", "", .) %>% 
+    gsub("raw_csv_02/", "", .) %>% 
     str_sub(-8, -1)   
   
   # bring in index of SNs and site names 
-  sn_index <- read_csv("STIC_SN_index_01.csv") %>% 
+  sn_index <- read_csv("STIC_SN_index_02.csv") %>% 
     drop_na()
   
   # create site name var for use in saving later 
