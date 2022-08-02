@@ -7,7 +7,7 @@ library(tidyverse)
 library(STICr)
 
 # Create list of file paths to iterate over 
-data_dir <- "raw_csv_v1"
+data_dir <- "raw_csv_02"
 fs::dir_ls(data_dir)
 stic_files <- fs::dir_ls(file.path(data_dir), regexp = "\\.csv$")
 
@@ -16,20 +16,21 @@ for(i in 1:length(stic_files)) {
   # get information about file and sensor
   path_to_raw <- stic_files[i]
   
-  # isolate SN from full filepath
+  # isolate SN from full file path
   logger_no <- gsub(".csv", "", path_to_raw) %>% 
     gsub("_STIC", "", .) %>% 
-    gsub("raw_v1/", "", .) %>% 
+    gsub("raw_02/", "", .) %>% 
     str_sub(-8, -1)   
   
   # bring in index of SNs and site names 
-  sn_index <- read_csv("STIC_SN_index_v1.csv")
+  sn_index <- read_csv("STIC_SN_index_02.csv") %>% 
+    drop_na()
   
   # create site name var for use in saving later 
   site_name <- sn_index$location[sn_index$sn == logger_no]
   
   # apply tidy_hobo_data to files
-  path_to_tidy <- file.path(data_dir, "tidy", paste0(site_name, "_tidy.csv"))
+  path_to_tidy <- file.path(data_dir, "tidy", paste0(site_name, "_tidy.csv")) # do we need this
   stic_data_tidy <- tidy_hobo_data(infile = stic_files[i])
   
   # figure out start and end date for each file for saving
@@ -57,9 +58,7 @@ for(i in 1:length(stic_files)) {
     add_column(rType = "STIC", .before = 4) %>% 
     add_column(rep = "00", .before = 5) %>% 
     add_column(sublocation = subloc, .before = 6) %>% 
-    add_column(SN = logger_no, .before = 7) %>% 
-    rename(condUncal = conductivity_uncal) %>% 
-    rename(tempC = temperature)
+    add_column(SN = logger_no, .before = 7)
   
   # save in correct format, i.e., 
   # startDate-endDate_siteID_rType_rep_sublocation
@@ -67,7 +66,25 @@ for(i in 1:length(stic_files)) {
   write_csv(stic_data_tidy, file.path(data_dir, "tidy", 
                                             paste0(start_date, "-", end_date, "_", site_name, "_",
                                                    "STIC_00_", subloc, ".csv")))
-  # status update
+  
+  # status update for tidying
   print(paste0("saved tidy STIC # ", i, " of ", length(stic_files), " at ", Sys.time()))
+  
+  # After writing tidy, we could calibrate and save again at this point
+  
+  stic_calibrations <- read_csv("stic_calibration.csv") 
+  
+  # get and apply calibration
+  logger_calibration <- subset(stic_calibrations, sn == logger_no)
+  calibration_fit <- get_calibration(logger_calibration)
+  stic_data_calibrated <- apply_calibration(stic_data_tidy, calibration_fit)
+  
+  calibrated_save_dir <- "calibrated"
+  write_csv(stic_data_calibrated, file.path(calibrated_save_dir, 
+                                      paste0(start_date, "-", end_date, "_", site_name, "_",
+                                             "STIC_00_", subloc, ".csv")))
+  
+  # status update for calibrating
+  print(paste0("saved calibrated STIC # ", i, " of ", length(stic_files), " at ", Sys.time()))
   
 }
