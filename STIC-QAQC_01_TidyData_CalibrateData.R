@@ -94,6 +94,11 @@ for(i in 1:length(stic_files)) {
     stic_data_calibrated <- apply_calibration(stic_data_tidy, calibration_fit)
   }
   
+  # Create QAQC column that identifies when calibrated value is
+  # outside of the range of the QAQC standard
+  stic_data_calibrated$outside_std_range <- 
+    dplyr::if_else(stic_data_calibrated$SpC >= max(logger_calibration$standard), "B", "")
+  
   # Save in correct format
   calibrated_save_dir <- "calibrated"
   write_csv(stic_data_calibrated, file.path(calibrated_save_dir, 

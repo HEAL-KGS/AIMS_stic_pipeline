@@ -39,7 +39,7 @@ if (str_sub(stic_data_classified$siteID, 1, 2) == "EN") {
   }
   
 
-# Deal with negative spc values (maybe move to previous script) THIS IS A
+# Deal with negative spc values (maybe move to previous script) 
 stic_data_classified <- stic_data_classified %>% 
   mutate(SpC = if_else(
     condition = SpC <= -1,
@@ -50,10 +50,17 @@ stic_data_classified <- stic_data_classified %>%
     true = "A", 
     false = "" ))
 
-# Flag if outside calibration range (maybe move to previous script) THIS IS B
-# First we need to bring in calibration data 
+# concatenate the two QAQC columns with col codes: "A" for negative Spc; 
+# "B" for Spc value outside of standard range
 
-stic_calibrations <- read_csv("stic_calibration.csv")
+stic_data_classified$outside_std_range <- "B"
+
+stic_data_classified$QAQC <- 
+  stringr::str_c(stic_data_classified$SpC_neg, '', stic_data_classified$outside_std_range)
+
+stic_data_classified <- stic_data_classified %>% 
+  select(- outside_std_range) %>% 
+  select(- SpC_neg)
 
 # Save in merged_qaqc folder
 save_dir <- "merged_qaqc"
