@@ -10,7 +10,7 @@ library(tidyverse)
 library(STICr)
 
 # Get list of file paths for tidy folder
-data_dir <- "merged_classified"
+data_dir <- "classified_test"
 fs::dir_ls(data_dir)
 stic_file_list <- fs::dir_ls(data_dir, regexp = "\\.csv$")
 
@@ -50,8 +50,8 @@ stic_data_classified <- stic_data_classified %>%
     true = "A", 
     false = "" ))
 
-# concatenate the two QAQC columns with col codes: "A" for negative Spc; 
-# "B" for Spc value outside of standard range
+# concatenate the two QAQC columns with col codes: "A" for negative SpC; 
+# "B" for SpC value outside of standard range
 
 stic_data_classified$outside_std_range <- "B"
 
@@ -63,9 +63,9 @@ stic_data_classified <- stic_data_classified %>%
   select(- SpC_neg)
 
 # Save in merged_qaqc folder
-save_dir <- "merged_qaqc"
+save_dir <- "qaqc_test"
 
-stic_data_tidy %>% 
+stic_data_classified %>% 
   group_split(siteID) %>% 
   walk(~write_csv(.x, file.path(save_dir, paste0(.x$siteID[1], ".csv"))))
 

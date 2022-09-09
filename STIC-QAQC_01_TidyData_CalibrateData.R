@@ -8,12 +8,16 @@
 # apply_calibration to produce a folder of tidied CSVs with the 
 # calibrated SpC column, then saves with the same naming scheme
 
+# reinstall STICr if necessary 
+library(devtools)
+# devtools::install_github("HEAL-KGS/STICr")
+
 # load STICr and tidyverse
 library(tidyverse)
 library(STICr)
 
 # Create list of file paths to iterate over 
-data_dir <- "raw_csv_02"
+data_dir <- "raw_csv_03"
 fs::dir_ls(data_dir)
 stic_files <- fs::dir_ls(file.path(data_dir), regexp = "\\.csv$")
 
@@ -25,11 +29,11 @@ for(i in 1:length(stic_files)) {
   # isolate SN from full file path
   logger_no <- gsub(".csv", "", path_to_raw) %>% 
     gsub("_STIC", "", .) %>% 
-    gsub("raw_csv_02/", "", .) %>% 
+    gsub("raw_csv_03/", "", .) %>% 
     str_sub(-8, -1)   
   
   # bring in index of SNs and site names 
-  sn_index <- read_csv("STIC_SN_index_02.csv") %>% 
+  sn_index <- read_csv("STIC_SN_index_03.csv") %>% 
     drop_na()
   
   # create site name var for use in saving later 
@@ -69,7 +73,7 @@ for(i in 1:length(stic_files)) {
   # save in correct format, i.e., 
   # startDate-endDate_siteID_rType_rep_sublocation
   # 20220403-20220620_OKM01_STIC_00_HS.csv
-  tidy_save_dir <- "tidy"
+  tidy_save_dir <- "tidy_test"
   write_csv(stic_data_tidy, file.path(tidy_save_dir, 
                                             paste0(start_date, "-", end_date, "_", site_name, "_",
                                                    "STIC_00_", subloc, ".csv")))
@@ -100,7 +104,7 @@ for(i in 1:length(stic_files)) {
     dplyr::if_else(stic_data_calibrated$SpC >= max(logger_calibration$standard), "B", "")
   
   # Save in correct format
-  calibrated_save_dir <- "calibrated"
+  calibrated_save_dir <- "calibrated_test"
   write_csv(stic_data_calibrated, file.path(calibrated_save_dir, 
                                       paste0(start_date, "-", end_date, "_", site_name, "_",
                                              "STIC_00_", subloc, ".csv")))
