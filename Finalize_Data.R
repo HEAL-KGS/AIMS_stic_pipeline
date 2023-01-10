@@ -10,7 +10,7 @@ library(tidyverse)
 library(STICr)
 
 # Get list of file paths for tidy folder
-data_dir <- "classified_test"
+data_dir <- "merged_classified"
 fs::dir_ls(data_dir)
 stic_file_list <- fs::dir_ls(data_dir, regexp = "\\.csv$")
 
@@ -62,8 +62,16 @@ stic_data_classified <- stic_data_classified %>%
   select(- outside_std_range) %>% 
   select(- SpC_neg)
 
+
+if(is.na(stic_data_classified$SpC)) {
+  stic_data_classified$wetdry <- dplyr::if_else(stic_data_classified$condUncal >= 1000, "wet", "dry")
+}
+
+
+
+
 # Save in merged_qaqc folder
-save_dir <- "qaqc_test"
+save_dir <- "merged_qaqc"
 
 stic_data_classified %>% 
   group_split(siteID) %>% 
