@@ -1,0 +1,50 @@
+---
+title: "STIC Summary"
+author: "Christopher Wheeler"
+date: '2022-09-08'
+output: pdf_document
+params:
+    datafile: "sensor.csv"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Bring in processed STIC data frame
+
+```{r import}
+library(tidyverse)
+stic_data <- read_csv(params$datafile)
+
+head(stic_data)
+```
+
+## Time series of SpC colored by wet/dry designation (red dot represents field SpC measurement)
+
+```{r Spc time series}
+ggplot(stic_data, aes(x = datetime, y = SpC, color = wetdry, group = 1)) + 
+  geom_path(size = 0.7) + 
+   theme_bw() + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "black", size = 1)) + 
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14))
+```
+
+## Time series of Temperature (C) recorded by STIC
+
+```{r temp time series}
+ggplot(stic_data, aes(x = datetime, y = tempC)) + 
+  geom_path() + 
+  geom_smooth(color = "steelblue", se = FALSE) +
+   theme_bw() + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "black", size = 1)) + 
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14))
+```
+
+
