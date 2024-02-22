@@ -5,11 +5,10 @@ library(tidyverse)
 library(STICr)
 
 # load in metadata 
-metadata <- read_csv("KNZ_STIC_metadata/KNZ_STIC_QAQC_metadata/KNZ_STIC_QAQC_metadata.csv") 
+metadata <- read_csv("YMR_STIC_metadata/YMR_STIC_QAQC_metadata/YMR_STIC_QAQC_metadata.csv") 
 
 # Create list of file paths to iterate over 
-data_dir <- "KNZ_STIC_QAQC"
-graph_save_dir <- "KNZ_QAQC_graphs"
+data_dir <- "YMR_STIC_QAQC"
 fs::dir_ls(data_dir)
 stic_files <- list.files(file.path(data_dir), pattern = "\\.csv$")
 
@@ -45,8 +44,8 @@ for(i in 1:length(stic_files)) {
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 14))
   
-  ggsave(paste0("KNZ_QAQC_graphs/", site_name, ".png"))
-
+  ggsave(paste0(site_name, ".png"))
+  
 }
   
 
