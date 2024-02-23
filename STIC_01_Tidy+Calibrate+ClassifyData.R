@@ -21,10 +21,10 @@ library(STICr)
 sn_index <- read_csv("OKA_STIC_metadata/OKA_STIC_sn_indices/OKA_STIC_sn_index_20220705_20221025.csv") 
 
 # Cut off record after pull time from STIC_sn_index df
-sn_index <- sn_index %>% 
-  mutate(pull_datetime = lubridate::mdy_hm(pull_datetime, tz = "US/Central")) %>% 
-  mutate(datetime_utc = with_tz(pull_datetime, "UTC")) %>% 
-  mutate(rounded_datetime = lubridate::floor_date(datetime_utc, unit = "15 mins")) %>% 
+sn_index <- sn_index |> 
+  mutate(pull_datetime = lubridate::mdy_hm(pull_datetime, tz = "US/Central")) |> 
+  mutate(datetime_utc = with_tz(pull_datetime, "UTC")) |> 
+  mutate(rounded_datetime = lubridate::floor_date(datetime_utc, unit = "15 mins")) |> 
   mutate(pull_date = lubridate::date(rounded_datetime))
 
 classified_save_dir <- "OKA_STIC_classified"
@@ -43,8 +43,8 @@ for(i in 1:length(stic_files)) {
   path_to_raw <- stic_files[i]
   
   # isolate SN from full file path
-  logger_no <- gsub(".csv", "", path_to_raw) %>% 
-    gsub("_STIC", "", .) %>% 
+  logger_no <- gsub(".csv", "", path_to_raw) |> 
+    gsub("_STIC", "", .) |> 
     str_sub(-8, -1)   
 
   # create site name var for use in saving later 
@@ -57,17 +57,17 @@ for(i in 1:length(stic_files)) {
     
     last_date <- min(sn_index$rounded_datetime, na.rm = TRUE)
 
-    stic_data_tidy <- stic_data_tidy %>% 
+    stic_data_tidy <- stic_data_tidy |> 
       filter(datetime < last_date)
     
-    start_date <- min(stic_data_tidy$datetime, na.rm = TRUE) %>%
-      lubridate::date() %>%
-      as.character() %>%
+    start_date <- min(stic_data_tidy$datetime, na.rm = TRUE) |>
+      lubridate::date() |>
+      as.character() |>
       gsub("-", "", .)
     
-    end_date <- max(stic_data_tidy$datetime, na.rm = TRUE) %>%
-      lubridate::date() %>%
-      as.character() %>%
+    end_date <- max(stic_data_tidy$datetime, na.rm = TRUE) |>
+      lubridate::date() |>
+      as.character() |>
       gsub("-", "", .)
     
     # also need to make a sublocation variable to use when saving
@@ -78,27 +78,27 @@ for(i in 1:length(stic_files)) {
     }
     
     # make the additional columns per AIMS format
-    stic_data_tidy <- stic_data_tidy %>%
-      add_column(project = "AIMS", .before = 1) %>%
-      add_column(siteID = site_name, .before = 3) %>%
-      add_column(rType = "STIC", .before = 4) %>%
-      add_column(rep =  paste0(start_date, "-", end_date)) %>%
-      add_column(sublocation = subloc, .before = 6) %>%
+    stic_data_tidy <- stic_data_tidy |>
+      add_column(project = "AIMS", .before = 1) |>
+      add_column(siteID = site_name, .before = 3) |>
+      add_column(rType = "STIC", .before = 4) |>
+      add_column(rep =  paste0(start_date, "-", end_date)) |>
+      add_column(sublocation = subloc, .before = 6) |>
       add_column(SN = logger_no, .before = 7)
     
   } else {
     
-    stic_data_tidy <- stic_data_tidy %>% 
+    stic_data_tidy <- stic_data_tidy |> 
       filter(datetime < sn_index$rounded_datetime[sn_index$location == site_name])
     
-    start_date <- min(stic_data_tidy$datetime, na.rm = TRUE) %>%
-      lubridate::date() %>%
-      as.character() %>%
+    start_date <- min(stic_data_tidy$datetime, na.rm = TRUE) |>
+      lubridate::date() |>
+      as.character() |>
       gsub("-", "", .)
     
-    end_date <- max(stic_data_tidy$datetime, na.rm = TRUE) %>%
-      lubridate::date() %>%
-      as.character() %>%
+    end_date <- max(stic_data_tidy$datetime, na.rm = TRUE) |>
+      lubridate::date() |>
+      as.character() |>
       gsub("-", "", .)
     
     # also need to make a sublocation variable to use when saving
@@ -109,24 +109,24 @@ for(i in 1:length(stic_files)) {
     }
     
     # make the additional columns per AIMS format
-    stic_data_tidy <- stic_data_tidy %>%
-      add_column(project = "AIMS", .before = 1) %>%
-      add_column(siteID = site_name, .before = 3) %>%
-      add_column(rType = "STIC", .before = 4) %>%
-      add_column(rep =  paste0(start_date, "-", end_date)) %>%
-      add_column(sublocation = subloc, .before = 6) %>%
+    stic_data_tidy <- stic_data_tidy |>
+      add_column(project = "AIMS", .before = 1) |>
+      add_column(siteID = site_name, .before = 3) |>
+      add_column(rType = "STIC", .before = 4) |>
+      add_column(rep =  paste0(start_date, "-", end_date)) |>
+      add_column(sublocation = subloc, .before = 6) |>
       add_column(SN = logger_no, .before = 7)
   }
  
   # Now begin calibrating and re-saving the tidied CSVs:
   # get and apply calibration
-  logger_calibration <- subset(stic_calibrations, sn == logger_no) %>% 
-    rename(sensor = sn) %>% 
+  logger_calibration <- subset(stic_calibrations, sn == logger_no) |> 
+    rename(sensor = sn) |> 
     select(standard, condUncal)
   
   # Create column of NAs for SpC if there is no calibration info for that logger
   if (dim(logger_calibration)[1] == 0) {
-    stic_data_calibrated <- stic_data_tidy %>% 
+    stic_data_calibrated <- stic_data_tidy |> 
       mutate(SpC = NA, outside_std_range = NA)
     
     stic_data_classified <- STICr::classify_wetdry(stic_data = stic_data_calibrated, classify_var =  "condUncal",

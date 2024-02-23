@@ -22,12 +22,12 @@ for(i in 1:length(stic_files)) {
   site_name <- STIC_file$siteID[1]
   
   # subset meta for just that site
-  meta_sub <- metadata %>% 
-    filter(Location == site_name) %>% 
+  meta_sub <- metadata |> 
+    filter(Location == site_name) |> 
     mutate(datetime = lubridate::mdy_hm(datetime))
   
-  STIC_file_long <- STIC_file %>% 
-    select(datetime, condUncal, tempC, SpC, wetdry) %>% 
+  STIC_file_long <- STIC_file |> 
+    select(datetime, condUncal, tempC, SpC, wetdry) |> 
     pivot_longer(cols = c(condUncal, tempC, SpC), names_to = "variable")
   
   # make as single faceted plot 

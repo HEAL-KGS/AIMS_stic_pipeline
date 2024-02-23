@@ -27,14 +27,14 @@ for(i in 1:length(stic_files)){
   
   site_name <- qaqc_stic$siteID[1]
   
-  start_date <- min(qaqc_stic$datetime, na.rm = TRUE) %>%
-    lubridate::date() %>%
-    as.character() %>%
+  start_date <- min(qaqc_stic$datetime, na.rm = TRUE) |>
+    lubridate::date() |>
+    as.character() |>
     gsub("-", "", .)
   
-  end_date <- max(qaqc_stic$datetime, na.rm = TRUE) %>%
-    lubridate::date() %>%
-    as.character() %>%
+  end_date <- max(qaqc_stic$datetime, na.rm = TRUE) |>
+    lubridate::date() |>
+    as.character() |>
     gsub("-", "", .)
   
   # Save in correct format
