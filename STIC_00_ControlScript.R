@@ -10,8 +10,14 @@
 library(STICr)
 library(tidyverse)
 
+## Specify root path - this will likely vary as a function of what computer you are 
+## working on, but should not be changed for specific sites.
+## this should point to the AIMS working data folder for Approach 1
+path_root <- "G:\.shortcut-targets-by-id\1KSx3E1INg4hQNlHWYnygPi41k_ku66fz\Track 2 AIMS\Data [working files]\Core datasets (as defined by implementation plan)\Approach 1_sensors and STICs"
+
 ## variables to specify paths, sites, directories for this run.
-## needed are:
+## all paths should be relative to path_root
+## variables needed are:
 ##  - path_sn_index = path to CSV file linking STIC SNs to sites, used in STIC_01_...
 ##  - path_calibration_data = path to CSV file with calibration data for each STIC SN, used in STIC_01_...
 ##  - path_metadata = path to STIC metadata file with field observations
@@ -19,7 +25,8 @@ library(tidyverse)
 ##  - dir_data_classified = directory to save classified output from script STIC_01_...
 ##  - dir_data_combined = directory to save combined output from script STIC_02_...
 ##  - dir_data_QAQC = directory to save QAQC output from script STIC_03_...
-##  - dir_save_plots = directory to save any visualizations or plots
+##  - dir_save_plots = directory to save any visualizations or plots from script STIC_04_...
+# YOUNGMEYER DEC 2023: INSTRUCTIONS+LINKS: https://docs.google.com/document/d/1UqQPwJOuIVQAeLMfKfvFm_pfU-bGRlb3NENokECNL9Q/edit#heading=h.lnndbhog6c9i
 path_sn_index <- 
 path_calibration_data <- 
 path_observations <- 
@@ -30,11 +37,9 @@ dir_save_plots <-
 
 ## archived variables from past processing runs - must be commented out
 # OKA summer 2023 processing by Chris
-path_sn_index <- "OKA_STIC_metadata/OKA_STIC_sn_indices/OKA_STIC_sn_index_20220705_20221025.csv"
-path_calibration_data <- "OKA_STIC_metadata/OKA_STIC_calibrations/OKA_STIC_calibrations_20220705_20221025.csv"
-dir_data_raw <- "OKA_STIC_raw/OKA_STIC_20220705_20221025_raw"
-dir_data_classified <- "OKA_STIC_classified"
-dir_data_combined <- "OKA_STIC_combined"
-dir_data_QAQC <- "OKA_STIC_QAQC"
-
-
+#path_sn_index <- "OKA_STIC_metadata/OKA_STIC_sn_indices/OKA_STIC_sn_index_20220705_20221025.csv"
+#path_calibration_data <- "OKA_STIC_metadata/OKA_STIC_calibrations/OKA_STIC_calibrations_20220705_20221025.csv"
+#dir_data_raw <- "OKA_STIC_raw/OKA_STIC_20220705_20221025_raw"
+#dir_data_classified <- "OKA_STIC_classified"
+#dir_data_combined <- "OKA_STIC_combined"
+#dir_data_QAQC <- "OKA_STIC_QAQC"
