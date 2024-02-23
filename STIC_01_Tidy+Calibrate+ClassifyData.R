@@ -1,4 +1,4 @@
-# STIC_01_Tidy+Calibrate+ClassifyData.R
+## STIC_01_Tidy+Calibrate+ClassifyData.R
 # First AIMS STIC pipeline script
 # Iterates tidy_hobo_data over a folder of raw STIC CSVs
 # Then, saves the tidy files in the correct AIMS format:
@@ -8,17 +8,12 @@
 # apply_calibration, and classify_wetdry to produce a folder of tidied CSVs with the 
 # calibrated SpC column, then saves with the same naming scheme
 
-# reinstall STICr if necessary 
-#library(devtools)
-#devtools::install_github("HEAL-KGS/STICr")
-
-# load STICr and tidyverse
-library(tidyverse)
-library(STICr)
+# load control script
+source("STIC_00_ControlScript.R")
 
 # bring in STIC serial number and location index
 # Need to change path for each run
-sn_index <- read_csv("OKA_STIC_metadata/OKA_STIC_sn_indices/OKA_STIC_sn_index_20220705_20221025.csv") 
+sn_index <- read_csv(path_sn_index) 
 
 # Cut off record after pull time from STIC_sn_index df
 sn_index <- sn_index |> 
@@ -27,15 +22,13 @@ sn_index <- sn_index |>
   mutate(rounded_datetime = lubridate::floor_date(datetime_utc, unit = "15 mins")) |> 
   mutate(pull_date = lubridate::date(rounded_datetime))
 
-classified_save_dir <- "OKA_STIC_classified"
 
 # bring in calibration points dataframe
-stic_calibrations <- read_csv("OKA_STIC_metadata/OKA_STIC_calibrations/OKA_STIC_calibrations_20220705_20221025.csv") 
+stic_calibrations <- read_csv(path_calibration_data) 
 
 # Create list of file paths to iterate over 
-data_dir <- "OKA_STIC_raw/OKA_STIC_20220705_20221025_raw"
-fs::dir_ls(data_dir)
-stic_files <- list.files(file.path(data_dir), pattern = "\\.csv$")
+fs::dir_ls(dir_data_raw)
+stic_files <- list.files(file.path(dir_data_raw), pattern = "\\.csv$")
 
 # loop for applying tidy_hobo_data and naming correctly 
 for(i in 1:length(stic_files)) {
@@ -51,7 +44,7 @@ for(i in 1:length(stic_files)) {
   site_name <- sn_index$location[sn_index$sn == logger_no]
   
   # apply tidy_hobo_data to files
-  stic_data_tidy <- tidy_hobo_data(infile = file.path(data_dir, stic_files[i]), convert_utc = TRUE) 
+  stic_data_tidy <- tidy_hobo_data(infile = file.path(dir_data_raw, stic_files[i]), convert_utc = TRUE) 
 
   if (sum(str_detect(sn_index$location, site_name)) < 1) {
     
@@ -154,7 +147,7 @@ for(i in 1:length(stic_files)) {
   }
 
   # Save in correct format
-  write_csv(stic_data_classified, file.path(classified_save_dir, 
+  write_csv(stic_data_classified, file.path(dir_data_classified, 
                                       paste0(start_date, "-", end_date, "_", site_name,  "_",
                                              "STIC_00_", subloc, ".csv")))
   # status update for calibrating

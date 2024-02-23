@@ -1,18 +1,18 @@
 # STIC_03_QAQCdata.R
+#
 
-library(tidyverse)
-library(STICr)
+# load control script
+source("STIC_00_ControlScript.R")
 
 # Create list of file paths to iterate over 
-data_dir <- "OKA_STIC_combined"
-fs::dir_ls(data_dir)
-stic_files <- list.files(file.path(data_dir), pattern = "\\.csv$")
+fs::dir_ls(dir_data_combined)
+stic_files <- list.files(file.path(dir_data_combined), pattern = "\\.csv$")
 
-stic_files <- list.files(path = "OKA_STIC_combined")
+stic_files <- list.files(path = dir_data_combined)
 
 for(i in 1:length(stic_files)){
   
-  logger_record <- read.csv(file = paste0("OKA_STIC_combined/", stic_files[i]))
+  logger_record <- read.csv(file = file.path(dir_data_combined, stic_files[i]))
 
   logger_record["outside_std_range"][is.na(logger_record["outside_std_range"])] <- ""
   
@@ -38,8 +38,8 @@ for(i in 1:length(stic_files)){
     gsub("-", "", .)
   
   # Save in correct format
-  write_csv(qaqc_stic, file = paste0("OKA_STIC_QAQC/", start_date, "-", end_date,
-                                     "_", site_name,  "_", "STIC_00", ".csv"))
+  write_csv(qaqc_stic, file = file.path(paste0(start_date, "-", end_date,
+                                     "_", site_name,  "_", "STIC_00", ".csv")))
 
   print(paste("Finished processing and writing new file", stic_files[i], "."))
 }

@@ -3,13 +3,12 @@
 # All tidied and/or calibrated STIC files to date are in the directory
 # called "tidy" or the directory called "calibrated"
 
-# load tidyverse
-library(tidyverse)
+# load control script
+source("STIC_00_ControlScript.R")
 
-# Get list of file paths for KNZ_STIC_classified folder
-data_dir <- "OKA_STIC_classified"
-fs::dir_ls(data_dir)
-stic_file_list <- fs::dir_ls(data_dir, regexp = "\\.csv$")
+# Get list of file paths from the folder
+fs::dir_ls(dir_data_classified)
+stic_file_list <- fs::dir_ls(dir_data_classified, regexp = "\\.csv$")
 
 ### using the map_dfr function to loop in individual
 # files from the folder, then row bind
@@ -17,8 +16,6 @@ stic_data_classified <- stic_file_list |>
   map_dfr(read_csv) |> 
   mutate(siteID = as_factor(siteID))
 
-save_dir <- "OKA_STIC_combined"
-
 stic_data_classified |> 
   group_split(siteID) |> 
-  walk(~write_csv(.x, file.path(save_dir, paste0(.x$siteID[1], ".csv"))))
+  walk(~write_csv(.x, file.path(dir_data_combined, paste0(.x$siteID[1], ".csv"))))

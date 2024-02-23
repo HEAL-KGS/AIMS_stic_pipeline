@@ -1,23 +1,21 @@
 # STIC_04_GenerateQAQCgraphs.R
 
-# load STICr and tidyverse
-library(tidyverse)
-library(STICr)
+# load control script
+source("STIC_00_ControlScript.R")
 
 # load in metadata 
-metadata <- read_csv("KNZ_STIC_metadata/KNZ_STIC_QAQC_metadata/KNZ_STIC_QAQC_metadata.csv") 
+metadata <- read_csv(path_observations)
 
 # Create list of file paths to iterate over 
-data_dir <- "KNZ_STIC_QAQC"
-graph_save_dir <- "KNZ_QAQC_graphs"
-fs::dir_ls(data_dir)
-stic_files <- list.files(file.path(data_dir), pattern = "\\.csv$")
+dir_save_plots <- "KNZ_QAQC_graphs"
+fs::dir_ls(dir_data_QAQC)
+stic_files <- list.files(file.path(dir_data_QAQC), pattern = "\\.csv$")
 
 # loop for applying tidy_hobo_data and naming correctly 
 for(i in 1:length(stic_files)) {
   
   # load csv file
-  STIC_file <- read_csv(file.path(data_dir, stic_files[i]))
+  STIC_file <- read_csv(file.path(dir_data_QAQC, stic_files[i]))
   
   site_name <- STIC_file$siteID[1]
   
@@ -45,7 +43,7 @@ for(i in 1:length(stic_files)) {
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 14))
   
-  ggsave(file.path(graph_save_dir, paste0(site_name, ".png")))
+  ggsave(file.path(dir_save_plots, paste0(site_name, ".png")))
 
 }
   
