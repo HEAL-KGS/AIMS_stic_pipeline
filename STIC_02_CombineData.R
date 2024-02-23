@@ -1,4 +1,4 @@
-# STIC-QAQC_02_CombineData.R
+# STIC_02_CombineData.R
 # Script to row bind tidied and/or calibrated STIC files by the same site
 # All tidied and/or calibrated STIC files to date are in the directory
 # called "tidy" or the directory called "calibrated"

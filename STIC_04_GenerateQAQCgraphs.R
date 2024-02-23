@@ -1,4 +1,4 @@
-# Generate_STIC_Graphs.R
+# STIC_04_GenerateQAQCgraphs.R
 
 # load STICr and tidyverse
 library(tidyverse)

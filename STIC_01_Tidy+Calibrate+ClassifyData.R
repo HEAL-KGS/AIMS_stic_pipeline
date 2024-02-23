@@ -1,4 +1,4 @@
-# STIC-QAQC_01_TidyData_CalibrateData.R
+# STIC_01_Tidy+Calibrate+ClassifyData.R
 # First AIMS STIC pipeline script
 # Iterates tidy_hobo_data over a folder of raw STIC CSVs
 # Then, saves the tidy files in the correct AIMS format:
@@ -18,7 +18,7 @@ library(STICr)
 
 # bring in STIC serial number and location index
 # Need to change path for each run
-sn_index <- read_csv("YMR_STIC_metadata/YMR_STIC_sn_indices/YMR_STIC_sn_index_20220803_20230315.csv") 
+sn_index <- read_csv("OKA_STIC_metadata/OKA_STIC_sn_indices/OKA_STIC_sn_index_20220705_20221025.csv") 
 
 # Cut off record after pull time from STIC_sn_index df
 sn_index <- sn_index %>% 
@@ -27,13 +27,13 @@ sn_index <- sn_index %>%
   mutate(rounded_datetime = lubridate::floor_date(datetime_utc, unit = "15 mins")) %>% 
   mutate(pull_date = lubridate::date(rounded_datetime))
 
-classified_save_dir <- "YMR_STIC_classified"
+classified_save_dir <- "OKA_STIC_classified"
 
 # bring in calibration points dataframe
-stic_calibrations <- read_csv("YMR_STIC_metadata/YMR_STIC_calibrations/YMR_STIC_calibrations_20210715_20230315.csv") 
+stic_calibrations <- read_csv("OKA_STIC_metadata/OKA_STIC_calibrations/OKA_STIC_calibrations_20220705_20221025.csv") 
 
 # Create list of file paths to iterate over 
-data_dir <- "YMR_STIC_raw/YMR_STIC_20220803_20230315_raw"
+data_dir <- "OKA_STIC_raw/OKA_STIC_20220705_20221025_raw"
 fs::dir_ls(data_dir)
 stic_files <- list.files(file.path(data_dir), pattern = "\\.csv$")
 

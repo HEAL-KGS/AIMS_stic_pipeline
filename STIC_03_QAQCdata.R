@@ -1,4 +1,4 @@
-# QAQC_Data.R
+# STIC_03_QAQCdata.R
 
 library(tidyverse)
 library(STICr)
