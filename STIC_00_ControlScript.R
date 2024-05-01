@@ -12,25 +12,24 @@ library(tidyverse)
 
 ## Specify root path - this will likely vary as a function of what computer you are 
 ## working on, but should not be changed for specific sites.
-## this should point to the AIMS working data folder for Approach 1
-path_root <- "G:\.shortcut-targets-by-id\1KSx3E1INg4hQNlHWYnygPi41k_ku66fz\Track 2 AIMS\Data [working files]\Core datasets (as defined by implementation plan)\Approach 1_sensors and STICs"
+## this should point to the AIMS working data folder for Approach 1 STICs/Great_Plains
+## which is here: https://drive.google.com/drive/folders/1aMPuTPHhOdN2YyCC54Y0gz34fGjXNmQf
+path_root <- "G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track 2 AIMS/Data [working files]/Core datasets (as defined by implementation plan)/Approach 1_sensors and STICs/STICs/Great_Plains"
 
 ## variables to specify paths, sites, directories for this run.
 ## all paths should be relative to path_root
 ## variables needed are:
 ##  - path_sn_index = path to CSV file linking STIC SNs to sites, used in STIC_01_...
-##  - path_calibration_data = path to CSV file with calibration data for each STIC SN, used in STIC_01_...
-##  - path_metadata = path to STIC metadata file with field observations
+##  - path_observations = path to STIC metadata file with field observations
 ##  - dir_data_raw = directory with raw STIC output data in CSV format (export from HOBOware)
 ##  - dir_data_classified = directory to save classified output from script STIC_01_...
 ##  - dir_data_combined = directory to save combined output from script STIC_02_...
 ##  - dir_data_QAQC = directory to save QAQC output from script STIC_03_...
 ##  - dir_save_plots = directory to save any visualizations or plots from script STIC_04_...
 # YOUNGMEYER DEC 2023: INSTRUCTIONS+LINKS: https://docs.google.com/document/d/1UqQPwJOuIVQAeLMfKfvFm_pfU-bGRlb3NENokECNL9Q/edit#heading=h.lnndbhog6c9i
-path_sn_index <- 
-path_calibration_data <- 
-path_observations <- 
-dir_data_raw <- 
+path_sn_index <- file.path("YMR_STIC_metadata", "YMR_STIC_sn_index_20231212-hotswap.csv")
+path_observations <- file.path("YMR_STIC_metadata", "YMR_STIC_QAQC_metadata", "YMRhotswap_20231212.csv")
+dir_data_raw <- file.path("YMR_STIC_raw" , "YMR_STIC_20230315_20231212_raw")
 dir_data_classified <- 
 dir_data_combined <- 
 dir_save_plots <- 

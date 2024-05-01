@@ -24,6 +24,7 @@ sn_index <- sn_index |>
 
 
 # bring in calibration points dataframe
+path_calibration_data <- file.path("Calibrations", "Calibrations_All.csv") # path to Calibrations_All.csv file
 stic_calibrations <- read_csv(path_calibration_data) 
 
 # Create list of file paths to iterate over 
