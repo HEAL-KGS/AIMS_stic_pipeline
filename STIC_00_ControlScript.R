@@ -26,13 +26,13 @@ path_root <- "G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track
 ##  - dir_data_combined = directory to save combined output from script STIC_02_...
 ##  - dir_data_QAQC = directory to save QAQC output from script STIC_03_...
 ##  - dir_save_plots = directory to save any visualizations or plots from script STIC_04_...
-# YOUNGMEYER DEC 2023: INSTRUCTIONS+LINKS: https://docs.google.com/document/d/1UqQPwJOuIVQAeLMfKfvFm_pfU-bGRlb3NENokECNL9Q/edit#heading=h.lnndbhog6c9i
-path_sn_index <- file.path("YMR_STIC_metadata", "YMR_STIC_sn_index_20231212-hotswap.csv")
-path_observations <- file.path("YMR_STIC_metadata", "YMR_STIC_QAQC_metadata", "YMRhotswap_20231212.csv")
-dir_data_raw <- file.path("YMR_STIC_raw" , "YMR_STIC_20230315_20231212_raw")
-dir_data_classified <- 
-dir_data_combined <- 
-dir_save_plots <- 
+# KNZ OCTOBER 2023
+path_sn_index <- file.path(path_root, "KNZ_STIC_sn_indices", "KNZ+SHN_STIC_sn_index_20231016-collection.csv")
+path_observations <- file.path(path_root, "KNZ_STIC_metadata", "KNZ_STIC_QAQC_metadata", "KNZ_STIC_QAQC_metadata.csv")
+dir_data_raw <- file.path(path_root, "KNZ_STIC_raw" , "KNZ_STIC_202301_202310_raw")
+dir_data_classified <- file.path(path_root, "KNZ_STIC_classified")
+dir_data_combined <- file.path(path_root, "KNZ_STIC_combined")
+dir_save_plots <- file.path(path_root, "KNZ_STIC_plots")
 
 ## archived variables from past processing runs - must be commented out
 # OKA summer 2023 processing by Chris
