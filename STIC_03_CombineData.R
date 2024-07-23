@@ -1,14 +1,12 @@
-# STIC_02_CombineData.R
-# Script to row bind tidied and/or calibrated STIC files by the same site
-# All tidied and/or calibrated STIC files to date are in the directory
-# called "tidy" or the directory called "calibrated"
+# STIC_03_CombineData.R
+# Script to add new QAQCed data to existing QAQCed data.
 
 # load control script
 source("STIC_00_ControlScript.R")
 
 # Get list of file paths from the folder
-fs::dir_ls(dir_data_classified)
-stic_file_list <- fs::dir_ls(dir_data_classified, regexp = "\\.csv$")
+fs::dir_ls(dir_data_qaqc)
+stic_file_list <- fs::dir_ls(dir_data_qaqc, regexp = "\\.csv$")
 
 ### using the map_dfr function to loop in individual
 # files from the folder, then row bind

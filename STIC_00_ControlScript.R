@@ -9,6 +9,8 @@
 #devtools::install_github("HEAL-KGS/STICr")
 library(STICr)
 library(tidyverse)
+library(gridExtra) # for tableGrob
+library(patchwork)
 
 ## Specify root path - this will likely vary as a function of what computer you are 
 ## working on, but should not be changed for specific sites.
@@ -28,10 +30,10 @@ path_root <- "G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track
 ##  - dir_save_plots = directory to save any visualizations or plots from script STIC_04_...
 # KNZ OCTOBER 2023
 path_sn_index <- file.path(path_root, "KNZ_STIC_sn_indices", "KNZ+SHN_STIC_sn_index_20231016-collection.csv")
-path_observations <- file.path(path_root, "KNZ_STIC_metadata", "KNZ_STIC_QAQC_metadata", "KNZ_STIC_QAQC_metadata.csv")
+path_observations <- file.path(path_root, "KNZ_STIC_metadata", "KNZ_STIC_QAQC_metadata.csv")
 dir_data_raw <- file.path(path_root, "KNZ_STIC_raw" , "KNZ_STIC_202301_202310_raw")
 dir_data_classified <- file.path(path_root, "KNZ_STIC_classified")
-dir_data_combined <- file.path(path_root, "KNZ_STIC_combined")
+dir_data_qaqc <- file.path(path_root, "KNZ_STIC_qaqc")
 dir_save_plots <- file.path(path_root, "KNZ_STIC_plots")
 
 ## archived variables from past processing runs - must be commented out
