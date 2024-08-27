@@ -29,14 +29,19 @@ sn_index <-
 
 # bring in calibration points dataframe
 path_calibration_data <- file.path(path_root, "Calibrations", "Calibrations_All.csv") # path to Calibrations_All.csv file
-stic_calibrations <- read_csv(path_calibration_data) 
+stic_calibrations <- 
+  read_csv(path_calibration_data) |> 
+  mutate(standard = as.numeric(standard),
+         CalibrationDate = mdy(CalibrationDate))
 
 # Create list of file paths to iterate over 
 fs::dir_ls(dir_data_raw)
 stic_files <- list.files(file.path(dir_data_raw), pattern = "\\.csv$")
+n_files <- length(stic_files)
 
-# loop for applying tidy_hobo_data and naming correctly 
-for(i in 1:length(stic_files)) {
+# loop for applying tidy_hobo_data and naming correctly
+n_calibrated <- 0  # counter to keep track of how many had calibration data
+for(i in 1:n_files) {
   # get information about file and sensor
   path_to_raw <- stic_files[i]
   
@@ -99,8 +104,8 @@ for(i in 1:length(stic_files)) {
     # get and apply calibration
     logger_calibration <- 
       subset(stic_calibrations, sn == logger_no) |> 
-      rename(sensor = sn) |> 
-      select(standard, condUncal)
+      rename(sensor = sn)
+    # ggplot(logger_calibration, aes(x = standard, y = condUncal, color = factor(CalibrationDate))) + geom_point()
     
     # Create column of NAs for SpC if there is no calibration info for that logger
     if (dim(logger_calibration)[1] == 0) {
@@ -111,6 +116,15 @@ for(i in 1:length(stic_files)) {
       stic_data_classified <- STICr::classify_wetdry(stic_data = stic_data_calibrated, classify_var =  "condUncal",
                                                      threshold = 10000, "absolute")
     } else {
+      n_calibrated <- n_calibrated + 1
+      
+      # if multiple calibration dates, choose closest to logger start date
+      cal_dates <- unique(logger_calibration$CalibrationDate)
+      if (length(cal_dates) > 1){
+        cal_date <- cal_dates[which.min(abs(cal_dates - as.Date(stic_data_tidy_out$datetime[1])))]
+        logger_calibration <- subset(logger_calibration, CalibrationDate == cal_date)
+      }
+      
       calibration <- get_calibration(logger_calibration, method = "linear")
       stic_data_calibrated <- stic_data_tidy_out
       stic_data_calibrated$SpC <- predict(object = calibration, newdata = stic_data_calibrated)
@@ -142,3 +156,5 @@ for(i in 1:length(stic_files)) {
   }
  
 }
+
+print(paste0(n_calibrated, " of ", n_files, " calibrated"))

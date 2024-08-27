@@ -5,7 +5,8 @@
 source("STIC_00_ControlScript.R")
 
 # load in metadata 
-metadata <- read_csv(path_observations) |> 
+metadata <- 
+  read_csv(path_observations) |> 
   mutate(datetime = mdy_hm(datetime))
 
 # Create list of file paths to iterate over 
