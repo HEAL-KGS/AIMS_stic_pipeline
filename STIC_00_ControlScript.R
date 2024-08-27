@@ -34,7 +34,9 @@ path_observations <- file.path(path_root, "KNZ_STIC_metadata", "KNZ_STIC_QAQC_me
 dir_data_raw <- file.path(path_root, "KNZ_STIC_raw" , "KNZ_STIC_202301_202310_raw")
 dir_data_classified <- file.path(path_root, "KNZ_STIC_classified")
 dir_data_qaqc <- file.path(path_root, "KNZ_STIC_QAQC")
-dir_save_plots <- file.path(path_root, "KNZ_STIC_plots")
+dir_plots_qaqc <- file.path(path_root, "KNZ_STIC_QAQC_plots")
+dir_data_combined <- file.path(path_root, "KNZ_STIC_combined")
+dir_plots_combined <- file.path(path_root, "KNZ_STIC_combined_plots")
 
 ## archived variables from past processing runs - must be commented out
 # OKA summer 2023 processing by Chris

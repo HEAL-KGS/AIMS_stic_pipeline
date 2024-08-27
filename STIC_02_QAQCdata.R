@@ -76,7 +76,7 @@ for(i in 1:length(stic_files)){
   (qaqc_plot + qaqc_table) +
     plot_layout(ncol = 1, heights = c(5, 1))
   
-  ggsave(file.path(dir_save_plots, paste0(site_name, "_QAQC_", start_date, "-", end_date, ".png")),
+  ggsave(file.path(dir_plots_qaqc, paste0(site_name, "_QAQC_", start_date, "-", end_date, ".png")),
          width = 240, height = 190, units = "mm")
   
   # ask for QAQC decision
@@ -100,5 +100,5 @@ for(i in 1:length(stic_files)){
   write_csv(qaqc_stic, file = file.path(dir_data_qaqc, paste0(start_date, "-", end_date,
                                                               "_", site_name,  "_", "STIC_00", ".csv")))
   
-  print(paste("Finished processing and writing new file", stic_files[i], "."))
+  print(paste0("Finished processing and writing new file ", stic_files[i], ", i = ", i))
 }
