@@ -16,7 +16,8 @@ library(patchwork)
 ## working on, but should not be changed for specific sites.
 ## this should point to the AIMS working data folder for Approach 1 STICs/Great_Plains
 ## which is here: https://drive.google.com/drive/folders/1aMPuTPHhOdN2YyCC54Y0gz34fGjXNmQf
-path_root <- "G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track 2 AIMS/Data [working files]/Core datasets (as defined by implementation plan)/Approach 1_sensors and STICs/STICs/Great_Plains"
+# SZ: path_root <- "G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track 2 AIMS/Data [working files]/Core datasets (as defined by implementation plan)/Approach 1_sensors and STICs/STICs/Great_Plains"
+path_root <- "ALEXI PUT IN YOUR FOLDER PATH HERE"
 
 ## variables to specify paths, sites, directories for this run.
 ## all paths should be relative to path_root
@@ -29,10 +30,12 @@ path_root <- "G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track
 ##  - dir_data_combined = directory to save combined output from script STIC_03_...
 ##  - dir_plots_qaqc = directory to save QAQC plots from script STIC_02_...
 ##  - dir_plots_combined = directory to save combined plots from script STIC_03_...
-# KNZ OCTOBER 2023
-path_sn_index <- file.path(path_root, "KNZ_STIC_sn_indices", "KNZ+SHN_STIC_sn_index_20231016-collection.csv")
+# KNZ MAY 2024
+path_sn_index <- file.path(path_root, "KNZ_STIC_sn_indices", "ALEXI PUT IN MAY SN INDEX FILE HERE")
+dir_data_raw <- file.path(path_root, "KNZ_STIC_raw" , "ALEXI PUT IN MAY RAW DATA FOLDER HERE")
+
+# these should not change for a given watershed (KNZ, YMR, SHN)
 path_observations <- file.path(path_root, "KNZ_STIC_metadata", "KNZ_STIC_QAQC_metadata.csv")
-dir_data_raw <- file.path(path_root, "KNZ_STIC_raw" , "KNZ_STIC_202301_202310_raw")
 dir_data_classified <- file.path(path_root, "KNZ_STIC_classified")
 dir_data_qaqc <- file.path(path_root, "KNZ_STIC_QAQC")
 dir_data_combined <- file.path(path_root, "KNZ_STIC_combined")
@@ -40,6 +43,16 @@ dir_plots_qaqc <- file.path(path_root, "KNZ_STIC_QAQC_plots")
 dir_plots_combined <- file.path(path_root, "KNZ_STIC_combined_plots")
 
 ## archived variables from past processing runs - must be commented out
+# # KNZ OCTOBER 2023 - by Sam
+# path_sn_index <- file.path(path_root, "KNZ_STIC_sn_indices", "KNZ+SHN_STIC_sn_index_20231016-collection.csv")
+# dir_data_raw <- file.path(path_root, "KNZ_STIC_raw" , "KNZ_STIC_202301_202310_raw")
+# path_observations <- file.path(path_root, "KNZ_STIC_metadata", "KNZ_STIC_QAQC_metadata.csv")
+# dir_data_classified <- file.path(path_root, "KNZ_STIC_classified")
+# dir_data_qaqc <- file.path(path_root, "KNZ_STIC_QAQC")
+# dir_data_combined <- file.path(path_root, "KNZ_STIC_combined")
+# dir_plots_qaqc <- file.path(path_root, "KNZ_STIC_QAQC_plots")
+# dir_plots_combined <- file.path(path_root, "KNZ_STIC_combined_plots")
+
 # OKA summer 2023 processing by Chris
 #path_sn_index <- "OKA_STIC_metadata/OKA_STIC_sn_indices/OKA_STIC_sn_index_20220705_20221025.csv"
 #path_calibration_data <- "OKA_STIC_metadata/OKA_STIC_calibrations/OKA_STIC_calibrations_20220705_20221025.csv"

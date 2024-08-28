@@ -42,7 +42,7 @@ for(i in 1:length(stic_files)){
     as.character() |>
     str_replace_all("-", "")
   
-  # extract metadata within +/- 5 days of start date
+  # extract metadata within +/- 5 days of start or end date
   site_metadata <- 
     subset(metadata, 
            str_detect(Location, str_replace(site_name, "_DUP", "_1")) &  # if it is a DUP, look for _1

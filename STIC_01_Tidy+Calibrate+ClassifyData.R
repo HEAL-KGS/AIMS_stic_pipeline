@@ -12,7 +12,7 @@
 source("STIC_00_ControlScript.R")
 
 # make plots?
-plots <- F
+plots <- T
 
 # bring in STIC serial number and location index
 # Need to change path for each run
@@ -132,6 +132,7 @@ for(i in 1:n_files) {
       # Classify into binary wet/dry data frame
       stic_data_classified <- STICr::classify_wetdry(stic_data = stic_data_calibrated, classify_var =  "condUncal",
                                                      threshold = 10000, "absolute")
+      
       # Create QAQC column that identifies when calibrated value is
       # outside of the range of the QAQC standard
       stic_data_classified$outside_std_range <- 
