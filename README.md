@@ -1,0 +1,1 @@
+This is a pipeline used by the [AIMS project](https://osf.io/7gb5p/) for processing stream temperature, intermittency, and conductivity (STIC) logger data. It makes heavy use of the [STICr package](https://github.com/HEAL-KGS/STICr) and takes the data through a processing pipeline to transform it from raw HOBO output data to QAQCed, classified, and calibrated STIC data.
