@@ -11,7 +11,9 @@ metadata <-
 
 # Create list of file paths to iterate over 
 #fs::dir_ls(dir_data_classified)
-stic_files <- list.files(file.path(dir_data_classified), pattern = "\\.csv$")
+stic_files_classified <- list.files(file.path(dir_data_classified), pattern = "\\.csv$")
+stic_files_alreadyQAQCed <- list.files(file.path(dir_data_qaqc), pattern = "\\.csv$")
+stic_files <- stic_files_classified[!(substr(stic_files_classified, 1, 25)  %in% substr(stic_files_alreadyQAQCed, 1, 25))]
 
 for(i in 1:length(stic_files)){
   
