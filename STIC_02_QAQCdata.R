@@ -83,7 +83,7 @@ for(i in 1:length(stic_files)){
   
   # ask for QAQC decision
   # rating criteria: https://docs.google.com/document/d/14-qSH7_fj3CqxwJJr9kdaid0gozqLP1mWWJ_7gaSTaQ/edit
-  qaqc_rating <- menu(c("Excellent", "Good", "Fair", "Poor"), title = paste0(site_name, ", Quality Rating?"))
+  qaqc_rating <- menu(c("Excellent", "Good", "Fair", "Poor"), title = paste0(start_date, "-", end_date, "_", site_name, ", Quality Rating?"))
   
   # add qualitative rating
   if (qaqc_rating == 1){
@@ -99,8 +99,8 @@ for(i in 1:length(stic_files)){
   }
   
   # Save in correct format
-  write_csv(qaqc_stic, file = file.path(dir_data_qaqc, paste0(start_date, "-", end_date,
-                                                              "_", site_name,  "_", "STIC_00", ".csv")))
+  file_name <- paste0(start_date, "-", end_date, "_", site_name,  "_", "STIC_00", ".csv")
+  write_csv(qaqc_stic, file = file.path(dir_data_qaqc, file_name))
   
-  print(paste0("Finished processing and writing new file ", stic_files[i], ", i = ", i))
+  print(paste0("Finished processing and writing new file ", file_name, ", i = ", i))
 }
