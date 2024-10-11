@@ -13,22 +13,80 @@ df_all_raw <- bind_rows(lapply(stic_file_list, read_csv, col_types = "cTccnccncn
 
 # Step 1: Compare to field observations, create validation plots --------
 
-# load in metadata 
+## load in metadata - from STIC data collection 
 metadata <- 
   read_csv(path_observations) |> 
   mutate(datetime = mdy_hm(datetime, tz = "America/Chicago")) |> 
   rename(wetdry = wet_dry) |> 
   dplyr::select(Location, datetime, wetdry, SpC) |> 
   unique() |> 
-  subset(!is.na(wetdry) | !is.na(SpC))
+  subset(!is.na(wetdry) | !is.na(SpC)) |> 
+  mutate(source = "STIC datasheets")
 
 # convert to UTC to match STIC measurements
 metadata$datetime <- as.POSIXct(metadata$datetime, tz = "UTC")
 
+## load in metadata - from approach 2 LTMs
+# path is weird, have to get it out of PT data folder
+# approach 2 metadata (use for dry/wet at site
+#  interpretation: if Date is present but Temp is NA, site is dry
+df_app2 <- 
+  read_csv(file.path(path_root, "KNZ_STIC_metadata", "Approach2_KNZ.csv")) |> 
+  mutate(datetime = mdy_hm(paste0(Date, " ", `Time (CST)`), tz = "America/Chicago")) |> 
+  subset(is.finite(datetime))
+df_app2$wetdry <- ifelse(is.finite(df_app2$datetime) & is.finite(df_app2$`Temp (*C)`), 
+                         "wet", "dry")
+
+# convert to UTC to match STIC measurements
+df_app2$datetime <- as.POSIXct(df_app2$datetime, tz = "UTC")
+
+# get columns of interest
+df_app2_metadata <-
+  df_app2 |> 
+  rename(SpC = `Specific Cond. (uS/cm)`) |> 
+  mutate(Location = paste0(Site, "_1"),
+         source = "Approach 2") |> 
+  dplyr::select(all_of(names(metadata))) |> 
+  subset(is.finite(datetime))
+
+## load in metadata - from synoptic
+df_app3 <-
+  read_csv(file.path(path_root, "KNZ_STIC_metadata", "Approach3_KNZ.csv")) |> 
+  mutate(datetime = ymd_hms(paste0(date, " ", time_cst), tz = "America/Chicago"))
+df_app3_labtemp <-
+  read_csv(file.path(path_root, "KNZ_STIC_metadata", "Approach3_KNZ_LabTemp.csv"))
+
+# need to get lab temp at time of analysis to convert to SpC
+# for some reason dates don't match - use first 6 digits (yr+mo)
+df_app3$yrmo <- substr(df_app3$date, 1, 6)
+df_app3_labtemp$yrmo <- substr(df_app3_labtemp$date, 1, 6)
+df_app3_withTemp <- left_join(df_app3, 
+                              dplyr::select(df_app3_labtemp, yrmo, siteId, temp_analysis), 
+                              by = c("yrmo", "siteId"))
+
+# any with conductivity measurement by no lab temp?
+which(is.finite(df_app3_withTemp$conductivity) & is.na(df_app3_withTemp$temp_analysis))
+
+# conversions to match STIC measurements
+df_app3_withTemp$datetime <- as.POSIXct(df_app3_withTemp$datetime, tz = "UTC")
+df_app3_withTemp$wetdry <- ifelse(df_app3_withTemp$flow_state == "dry", "dry", "wet")
+df_app3_withTemp$SpC <- df_app3_withTemp$conductivity / (1 + 0.02 * (df_app3_withTemp$temp_analysis - 25)) # formula from https://www.solinst.com/products/dataloggers-and-telemetry/3001-levelogger-series/operating-instructions/user-guide/1-introduction/1-2-4-conductivity.php
+df_app3_withTemp$Location <- paste0(df_app3_withTemp$siteId, "_1")
+
+# get columns of interest
+df_app3_metadata <-
+  df_app3_withTemp |> 
+  mutate(source = "Approach 3") |> 
+  dplyr::select(all_of(names(metadata))) |> 
+  subset(is.finite(datetime))
+
+## combine all metadata
+metadata_all <- bind_rows(metadata, df_app2_metadata, df_app3_metadata)
+
 # validation
 df_validate <- validate_stic_data(stic_data = df_all_raw, 
-                                  field_observations = metadata, 
-                                  max_time_diff = 60,
+                                  field_observations = metadata_all, 
+                                  max_time_diff = 120,
                                   join_cols = c("siteID" = "Location"),
                                   get_SpC = T)
 
@@ -37,7 +95,7 @@ df_confusion <-
   df_validate |> 
   group_by(wetdry_obs, wetdry_STIC) |> 
   summarize(count = n()) |> 
-  subset(wetdry_obs != "damp")
+  subset(wetdry_obs %in% c("wet", "dry"))  # there are some "damp" observations - remove
 
 accuracy <- 
   (df_confusion$count[df_confusion$wetdry_obs=="wet" & df_confusion$wetdry_STIC=="wet"] +
@@ -61,12 +119,13 @@ SpC_min <- min(c(df_validate$SpC_obs, df_validate$SpC_STIC), na.rm = T)
 SpC_max <- max(c(df_validate$SpC_obs, df_validate$SpC_STIC), na.rm = T)
 
 p_SpC <-
-  ggplot(df_validate, aes(x = SpC_obs, y = SpC_STIC)) +
+  ggplot(df_validate, aes(x = SpC_obs, y = SpC_STIC, color = source)) +
   geom_abline(intercept = 0, slope = 1, color = "gray65") +
   geom_point() +
   scale_x_continuous(limits = c(SpC_min, SpC_max)) +
   scale_y_continuous(limits = c(SpC_min, SpC_max)) +
-  theme_bw()
+  theme_bw() +
+  theme(legend.position = "bottom")
 ggsave(file.path(dir_data_final, "..", paste0(watershed, "_AllSTICs_SpCAccuracy.png")),
        p_SpC, width = 95, height = 95, units = "mm")
 
