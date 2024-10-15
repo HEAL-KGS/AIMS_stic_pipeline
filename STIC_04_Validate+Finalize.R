@@ -88,14 +88,77 @@ df_validate <- validate_stic_data(stic_data = df_all_raw,
                                   field_observations = metadata_all, 
                                   max_time_diff = 120,
                                   join_cols = c("siteID" = "Location"),
-                                  get_SpC = T)
+                                  get_SpC = T) |> 
+  subset(wetdry_obs %in% c("wet", "dry"))  # there are some "damp" observations - remove
+
+# identify ideal condUncal threshold for wet/dry classification
+ggplot(df_validate) +
+  geom_histogram(aes(x = condUncal_STIC, fill = wetdry_obs), binwidth = 1000)
+
+df_classificationAccuracy <-
+  tibble(condUncal_thres = seq(1e2, 1e5, 100),
+         accuracy_prc = NA,
+         wetAsDry_prc = NA,
+         dryAsWet_prc = NA)
+for (c in 1:length(df_classificationAccuracy$condUncal_thres)){
+  cu <- df_classificationAccuracy$condUncal_thres[c]
+  
+  # overall accuracy
+  df_classificationAccuracy$accuracy_prc[c] <- 
+    (sum(df_validate$condUncal_STIC < cu & df_validate$wetdry_obs == "dry") +
+    sum(df_validate$condUncal_STIC >= cu & df_validate$wetdry_obs == "wet")) / 
+    sum(is.finite(df_validate$condUncal_STIC))
+  
+  # percent of wet observations misclassified as dry
+  df_classificationAccuracy$wetAsDry_prc[c] <- 
+    sum(df_validate$condUncal_STIC < cu & df_validate$wetdry_obs == "wet") / 
+    sum(df_validate$wetdry_obs == "wet")
+  
+  # percent of dry observations misclassified as wet
+  df_classificationAccuracy$dryAsWet_prc[c] <- 
+    sum(df_validate$condUncal_STIC >= cu & df_validate$wetdry_obs == "dry") / 
+    sum(df_validate$wetdry_obs == "dry")
+}
+
+df_classificationAccuracy$errorBalance <- 
+  abs(df_classificationAccuracy$wetAsDry_prc - df_classificationAccuracy$dryAsWet_prc)
+
+# choose optimal condUncal threshold
+condUncal_thres <- 30000
+p_threshold <-
+  df_classificationAccuracy |> 
+  dplyr::select(-errorBalance) |> 
+  pivot_longer(-condUncal_thres) |> 
+  ggplot(aes(x = condUncal_thres, y = value, color = name)) +
+  geom_vline(xintercept = condUncal_thres, color = "green") +
+  geom_vline(xintercept = 700, color = "orange") +
+  geom_line() +
+  scale_x_continuous(name = "condUncal Threshold",
+                     expand = c(0,0)) +
+  scale_y_continuous(name = "Classification Accuracy", labels = scales::percent,
+                     limits = c(0,1), expand = c(0,0)) +
+  scale_color_manual(values = c("accuracy_prc" = "black", 
+                                "dryAsWet_prc" = "blue",
+                                "wetAsDry_prc" = "red")) +
+  theme_bw() +
+  theme(panel.grid = element_blank())
+ggsave(file.path(dir_data_final, "..", paste0(watershed, "_AllSTICs_condUncalThreshold.png")),
+       p_threshold, width = 190, height = 95, units = "mm")
+
+# reclassify df_validate and df_all_raw based on new threshold
+df_validate$wetdry_STIC[df_validate$condUncal_STIC < condUncal_thres] <- "dry"
+df_validate$wetdry_STIC[df_validate$condUncal_STIC >= condUncal_thres] <- "wet"
+
+table(df_all_raw$wetdry)
+df_all_raw$wetdry[df_all_raw$condUncal < condUncal_thres] <- "dry"
+df_all_raw$wetdry[df_all_raw$condUncal >= condUncal_thres] <- "wet"
+table(df_all_raw$wetdry)
 
 # plot confusion matrix
 df_confusion <- 
   df_validate |> 
   group_by(wetdry_obs, wetdry_STIC) |> 
-  summarize(count = n()) |> 
-  subset(wetdry_obs %in% c("wet", "dry"))  # there are some "damp" observations - remove
+  summarize(count = n())
 
 accuracy <- 
   (df_confusion$count[df_confusion$wetdry_obs=="wet" & df_confusion$wetdry_STIC=="wet"] +
@@ -110,7 +173,7 @@ p_accuracy <-
   scale_fill_gradient(name = "Count", low = "gray85", high = "#0082c8", 
                       limits = c(0, max(df_confusion$count))) +
   labs(title = "KNZ STIC accuracy assessment", 
-       subtitle = paste0("Overall accuracy = ", round(100*accuracy, 1), "%"))
+       subtitle = paste0("Overall accuracy = ", round(100*accuracy, 1), "%\ncondUncal Threshold = ", condUncal_thres))
 ggsave(file.path(dir_data_final, "..", paste0(watershed, "_AllSTICs_ClassificationAccuracy.png")),
        p_accuracy, width = 120, height = 95, units = "mm")
 
