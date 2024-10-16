@@ -243,7 +243,8 @@ for (yr in yrs_to_save){
     group_walk(~ write_csv(.x, 
                            file = file.path(dir_data_final, 
                                             paste0("STIC_GP_", watershed, "_", .y$siteId, 
-                                            "_", .y$sublocation, "_", yr, ".csv"))))
+                                            "_", .y$sublocation, "_", yr, ".csv"))),
+               .keep = TRUE)
 }
 
 
