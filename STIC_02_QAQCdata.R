@@ -21,14 +21,12 @@ for(i in 1:length(stic_files)){
   
   logger_record["outside_std_range"][is.na(logger_record["outside_std_range"])] <- ""
   
-  qaqc_stic <- qaqc_stic_data(
-    logger_record,
-    spc_neg_correction = TRUE,
-    inspect_classification = TRUE,
-    anomaly_size = 5,
-    window_size = 1000,
-    concatenate_flags = TRUE
-  ) |> 
+  qaqc_stic <- 
+    qaqc_stic_data(logger_record,
+                   spc_neg_correction = TRUE,
+                   inspect_deviation = TRUE,
+                   deviation_size = 4,
+                   window_size = 96) |> 
     mutate(datetime = as_datetime(datetime))
   
   site_name <- qaqc_stic$siteID[1]
@@ -48,7 +46,7 @@ for(i in 1:length(stic_files)){
   site_metadata <- 
     subset(metadata, 
            str_detect(Location, str_replace(site_name, "_DUP", "_1")) &  # if it is a DUP, look for _1
-           datetime >= ymd(start_date) - days(5) &
+             datetime >= ymd(start_date) - days(5) &
              datetime <= ymd(end_date) + days(5))
   
   # prep for plotting

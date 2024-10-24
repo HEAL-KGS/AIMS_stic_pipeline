@@ -14,6 +14,9 @@ source("STIC_00_ControlScript.R")
 # make plots?
 plots <- T
 
+# threshold for classification
+condUncal_thres <- 700
+
 # bring in STIC serial number and location index
 # Need to change path for each run
 sn_index_in <- read_csv(path_sn_index) 
@@ -113,8 +116,9 @@ for(i in 1:n_files) {
         stic_data_tidy_out |> 
         mutate(SpC = NA, outside_std_range = NA)
       
-      stic_data_classified <- STICr::classify_wetdry(stic_data = stic_data_calibrated, classify_var =  "condUncal",
-                                                     threshold = 10000, "absolute")
+      stic_data_classified <- STICr::classify_wetdry(stic_data = stic_data_calibrated, 
+                                                     classify_var =  "condUncal",
+                                                     threshold = condUncal_thres, "absolute")
     } else {
       n_calibrated <- n_calibrated + 1
       
@@ -130,8 +134,9 @@ for(i in 1:n_files) {
       stic_data_calibrated$SpC <- predict(object = calibration, newdata = stic_data_calibrated)
       
       # Classify into binary wet/dry data frame
-      stic_data_classified <- STICr::classify_wetdry(stic_data = stic_data_calibrated, classify_var =  "condUncal",
-                                                     threshold = 10000, "absolute")
+      stic_data_classified <- STICr::classify_wetdry(stic_data = stic_data_calibrated, 
+                                                     classify_var =  "condUncal",
+                                                     threshold = condUncal_thres, "absolute")
       
       # Create QAQC column that identifies when calibrated value is
       # outside of the range of the QAQC standard
