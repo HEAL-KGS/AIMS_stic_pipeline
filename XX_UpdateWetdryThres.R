@@ -11,8 +11,13 @@
 library(STICr)
 library(tidyverse)
 
-# set directory of data - should be location of output of STIC_02_QAQCdata.R script
-setwd("G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track 2 AIMS/Data [working files]/Core datasets (as defined by implementation plan)/Approach 1_sensors and STICs/STICs/Great_Plains/KNZ_STIC_QAQC")
+## set directory of data - should be location of output of STIC_02_QAQCdata.R script
+# Checklist:
+#  [X] KNZ - completed 10/29/2024 by SZ - "G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track 2 AIMS/Data [working files]/Core datasets (as defined by implementation plan)/Approach 1_sensors and STICs/STICs/Great_Plains/KNZ_STIC_QAQC"
+#  [X] YMR - completed 10/29/2024 by SZ - "G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track 2 AIMS/Data [working files]/Core datasets (as defined by implementation plan)/Approach 1_sensors and STICs/STICs/Great_Plains/YMR_STIC_QAQC"
+#  [X] OKA - completed 10/29/2024 by SZ - "G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track 2 AIMS/Data [working files]/Core datasets (as defined by implementation plan)/Approach 1_sensors and STICs/STICs/Great_Plains/OKA_STIC_QAQC"
+
+setwd("G:/.shortcut-targets-by-id/1KSx3E1INg4hQNlHWYnygPi41k_ku66fz/Track 2 AIMS/Data [working files]/Core datasets (as defined by implementation plan)/Approach 1_sensors and STICs/STICs/Great_Plains/OKA_STIC_QAQC")
 
 # old and new threshold
 old_thres <- 10000
@@ -21,7 +26,7 @@ new_thres <- 700
 # list of files
 stic_file_list <- fs::dir_ls(regexp = "\\.csv$")
 for (s in stic_file_list){
-  # testing: s <- stic_file_list[122]
+  # testing: s <- stic_file_list[1]
   
   ## load data
   df_s <- read_csv(s)
@@ -36,7 +41,7 @@ for (s in stic_file_list){
   df_s$wetdry[df_s$condUncal > new_thres] <- "wet"
   # table(df_s$wetdry)
   # ggplot(df_s, aes(x = datetime, y = condUncal, color = wetdry)) + geom_point() + geom_hline(yintercept = c(old_thres, new_thres), linetype = "dashed") + theme_bw()
-
+  
   ## step 2: update moving window deviation QAQC flag
   # remove old "D" flag
   # count: sum(grepl("D", df_s$QAQC, fixed = TRUE))
@@ -44,7 +49,7 @@ for (s in stic_file_list){
   
   # redo moving window analysis
   QAQCnew <- qaqc_stic_data(df_s, spc_neg_correction = F, inspect_deviation = T, 
-                                 deviation_size = 4, window_size = 96)
+                            deviation_size = 4, window_size = 96)
   # count:sum(grepl("D", QAQCnew$QAQC, fixed = TRUE))
   
   # which have D in new QAQC column?

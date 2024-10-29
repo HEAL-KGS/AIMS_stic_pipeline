@@ -124,14 +124,13 @@ df_classificationAccuracy$errorBalance <-
   abs(df_classificationAccuracy$wetAsDry_prc - df_classificationAccuracy$dryAsWet_prc)
 
 # choose optimal condUncal threshold
-condUncal_thres <- 30000
+condUncal_thres <- 700
 p_threshold <-
   df_classificationAccuracy |> 
   dplyr::select(-errorBalance) |> 
   pivot_longer(-condUncal_thres) |> 
   ggplot(aes(x = condUncal_thres, y = value, color = name)) +
   geom_vline(xintercept = condUncal_thres, color = "green") +
-  geom_vline(xintercept = 700, color = "orange") +
   geom_line() +
   scale_x_continuous(name = "condUncal Threshold",
                      expand = c(0,0)) +
@@ -144,15 +143,6 @@ p_threshold <-
   theme(panel.grid = element_blank())
 ggsave(file.path(dir_data_final, "..", paste0(watershed, "_AllSTICs_condUncalThreshold.png")),
        p_threshold, width = 190, height = 95, units = "mm")
-
-# reclassify df_validate and df_all_raw based on new threshold
-df_validate$wetdry_STIC[df_validate$condUncal_STIC < condUncal_thres] <- "dry"
-df_validate$wetdry_STIC[df_validate$condUncal_STIC >= condUncal_thres] <- "wet"
-
-table(df_all_raw$wetdry)
-df_all_raw$wetdry[df_all_raw$condUncal < condUncal_thres] <- "dry"
-df_all_raw$wetdry[df_all_raw$condUncal >= condUncal_thres] <- "wet"
-table(df_all_raw$wetdry)
 
 # plot confusion matrix
 df_confusion <- 
@@ -234,7 +224,7 @@ df_out <-
                 tempC, rep, SpC, wetdry, qual_rating, QAQC)
 
 ## save in AIMS output format
-yrs_to_save <- c(2021, 2022, 2023)
+yrs_to_save <- c(2021, 2022, 2023, 2024)
 for (yr in yrs_to_save){
   # save CSV for each site and sublocation in this year
   df_out |> 
@@ -324,5 +314,5 @@ p_STICdata <-
   (p_prcwet + p_nstic) +
   plot_layout(ncol = 1, guides = "collect") &
   theme(legend.position = "bottom")
-ggsave(file.path(dir_data_final, "..", paste0(watershed, "_AllSTICs_SummaryPlots.png")),
+ggsave(file.path(dir_data_final, "..", paste0(watershed, "_AllSTICs_SummaryPlots2.png")),
        p_STICdata, width = 190, height = 120, units = "mm")
