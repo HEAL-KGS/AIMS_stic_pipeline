@@ -91,10 +91,10 @@ df_validate <- validate_stic_data(stic_data = df_all_raw,
                                   get_SpC = T) |> 
   subset(wetdry_obs %in% c("wet", "dry"))  # there are some "damp" observations - remove
 
-# identify ideal condUncal threshold for wet/dry classification
-ggplot(df_validate) +
-  geom_histogram(aes(x = condUncal_STIC, fill = wetdry_obs), binwidth = 1000)
+# save for STICr paper
+#write_csv(df_validate, file.path("..", "AIMS_STIC_GP", "data", "STIC_KNZ-Validation.csv"))
 
+# identify ideal condUncal threshold for wet/dry classification
 df_classificationAccuracy <-
   tibble(condUncal_thres = seq(1e2, 1e5, 100),
          accuracy_prc = NA,
@@ -124,7 +124,7 @@ df_classificationAccuracy$errorBalance <-
   abs(df_classificationAccuracy$wetAsDry_prc - df_classificationAccuracy$dryAsWet_prc)
 
 # choose optimal condUncal threshold
-condUncal_thres <- 700
+condUncal_thres <- df_classificationAccuracy$condUncal_thres[which.min(df_classificationAccuracy$errorBalance)]
 p_threshold <-
   df_classificationAccuracy |> 
   dplyr::select(-errorBalance) |> 
