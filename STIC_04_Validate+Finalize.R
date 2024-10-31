@@ -88,7 +88,8 @@ df_validate <- validate_stic_data(stic_data = df_all_raw,
                                   field_observations = metadata_all, 
                                   max_time_diff = 120,
                                   join_cols = c("siteID" = "Location"),
-                                  get_SpC = T) |> 
+                                  get_SpC = T,
+                                  get_QAQC = T) |> 
   subset(wetdry_obs %in% c("wet", "dry"))  # there are some "damp" observations - remove
 
 # save for STICr paper
